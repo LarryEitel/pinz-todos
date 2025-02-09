@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { PUBLIC_SERVER } from '$env/static/public';
-	import { Query } from '$lib/Query.svelte';
+	import { Query } from '$lib/query.svelte';
 	import { Z } from '$lib/Z.svelte';
 	import { schema, type Schema } from '../schema';
 

@@ -1,17 +1,11 @@
-import {
-	createSchema,
-	definePermissions,
-	ExpressionBuilder,
-	Row,
-	NOBODY_CAN,
-	ANYONE_CAN,
-	table,
-	string,
-	boolean,
-	number,
-	relationships,
-} from "@rocicorp/zero";
+// These data structures define your client-side schema.
+// They must be equal to or a subset of the server-side schema.
+// Note the "relationships" field, which defines first-class
+// relationships between tables.
+// See https://github.com/rocicorp/mono/blob/main/apps/zbugs/src/domain/schema.ts
+// for more complex examples, including many-to-many.
 
+import { createSchema, table, string, boolean, relationships } from '@rocicorp/zero';
 
 const types = table('type')
 	.columns({
@@ -42,55 +36,11 @@ export const schema = createSchema(1, {
 	relationships: [todoRelationship]
 });
 
-
 export type Schema = typeof schema;
 
-// The contents of your decoded JWT.
 type AuthData = {
-	sub: string | null;
+	// The logged-in user.
+	sub: string;
 };
 
-export const permissions = definePermissions<AuthData, Schema>(schema, () => {
-	const allowIfLoggedIn = (
-		authData: AuthData,
-		{ cmpLit }: ExpressionBuilder<Schema, keyof Schema["tables"]>
-	) => cmpLit(authData.sub, "IS NOT", null);
-
-	const allowIfMessageSender = (
-		authData: AuthData,
-		{ cmp }: ExpressionBuilder<Schema, "message">
-	) => cmp("senderID", "=", authData.sub ?? "");
-
-	return {
-		medium: {
-			row: {
-				insert: NOBODY_CAN,
-				update: {
-					preMutation: NOBODY_CAN,
-				},
-				delete: NOBODY_CAN,
-			},
-		},
-		user: {
-			row: {
-				insert: NOBODY_CAN,
-				update: {
-					preMutation: NOBODY_CAN,
-				},
-				delete: NOBODY_CAN,
-			},
-		},
-		message: {
-			row: {
-				// anyone can insert
-				insert: ANYONE_CAN,
-				// only sender can edit their own messages
-				update: {
-					preMutation: [allowIfMessageSender],
-				},
-				// must be logged in to delete
-				delete: [allowIfLoggedIn],
-			},
-		},
-	};
-});
+export const permissions = {};
